@@ -1,0 +1,7 @@
+---
+app_name: c26-health-monitor
+repo_url: ssh://xp-dev.com/c26-health-monitor
+repo_remote: origin
+repo_branch: master
+webapps_dir: /root
+

@@ -1,0 +1,4 @@
+---
+
+- include: setup_server.yml tags=setup_server
+- include: setup_app.yml tags=setup_app

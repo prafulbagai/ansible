@@ -1,0 +1,10 @@
+---
+ - name: read-write git checkout from repo
+   git:
+    repo: "{{repo_url}}"
+    dest: "{{webapps_dir}}/{{app_name}}"
+    accept_hostkey: yes
+    force: yes
+    remote: "{{repo_remote}}"
+    version: "{{repo_branch}}"
+   register: gitrepo

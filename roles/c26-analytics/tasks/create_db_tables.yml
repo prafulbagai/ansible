@@ -1,0 +1,3 @@
+---
+# - name: sync tables
+#   command: python {{webapps_dir}}/{{app_name}}/sync_tables.py

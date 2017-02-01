@@ -1,0 +1,8 @@
+---
+
+- include: setup_server.yml tags=setup_server
+- include: setup_mysql.yml tags=setup_mysql
+- include: setup_app.yml tags=setup_app
+- include: app_pip_req.yml tags=app_pip_req
+- include: symlink_nginx.yml tags=symlink_nginx
+- include: start_uwsgi.yml tags=start_uwsgi

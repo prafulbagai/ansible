@@ -1,0 +1,4 @@
+---
+
+ - name: Setup nginx_config_generator
+   command: echo cacdd71d590ecd2fcd44ab567f170729 | sudo -S sh /var/www/c26-server_security/Security_remote/nginx_config_generator.sh

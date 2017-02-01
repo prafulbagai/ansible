@@ -1,0 +1,11 @@
+---
+app_name: c26_clap
+repo_url: ssh://xp-dev.com/c26_clap
+repo_remote: origin
+repo_branch: master
+webapps_dir: /var/www
+app_database: clap
+wsgi_file: server.py
+wsgi_callable: app
+mysql_user: root
+mysql_password: 17576cube

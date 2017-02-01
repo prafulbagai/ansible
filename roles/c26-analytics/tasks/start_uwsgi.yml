@@ -1,0 +1,3 @@
+---
+ - name: start uwsgi in background
+   command: uwsgi --ini={{webapps_dir}}/{{app_name}}/conf_uwsgi.ini

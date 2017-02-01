@@ -1,0 +1,6 @@
+---
+app_name: c26_youtube
+repo_url: git@git.cube26.com:youtube/c26_youtube.git
+repo_remote: origin
+repo_branch: master
+webapps_dir: /var/www

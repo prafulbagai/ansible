@@ -1,0 +1,23 @@
+---
+- name: add mysql user if not already added
+  sudo: yes
+  mysql_user:
+    name: root                                   #name of user to add/remove
+    host: "{{item}}"
+    password: "{{mysql_password}}"          #user's password
+    login_user: "{{mysql_user}}"                 #username used for authentication
+    login_password: "{{mysql_password}}"    #password used for authentication
+    check_implicit_admin: yes
+    priv: "*.*:ALL,GRANT"
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: create/check for database
+  mysql_db: 
+    db: "{{app_database}}"
+    state: present 
+    login_user: "{{mysql_user}}"
+    login_password: "{{mysql_password}}"

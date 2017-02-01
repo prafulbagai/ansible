@@ -1,0 +1,18 @@
+---
+- name: transfer the script to be run
+  copy: src=post_to_logserver.py dest={{webapps_dir}}/{{app_name}} mode=0777
+
+- name: Post logid
+  command: python {{webapps_dir}}/{{app_name}}/post_to_logserver.py
+#  when: gitrepo.changed
+
+- name: Send email to test team 
+  local_action: mail
+                host='smtp.gmail.com'
+                port=587
+                username={{email_username}}
+                password={{email_password}}
+                to={{mail_recipients}}
+                subject="updated repository pulled"
+                body="new code deployed."
+  when: gitrepo.changed

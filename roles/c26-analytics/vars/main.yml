@@ -1,0 +1,16 @@
+---
+app_name: c26-health-monitor
+#app_name: c26-logid
+repo_url: ssh://xp-dev.com/c26-health-monitor
+#repo_url: ssh://xp-dev.com/c26-loghistory
+repo_remote: origin
+repo_branch: master
+webapps_dir: /root
+app_database: MAD
+wsgi_file: server.py
+wsgi_callable: app
+mysql_user: root
+mysql_password: cube26
+email_username: 
+email_password: 
+mail_recipients: 
