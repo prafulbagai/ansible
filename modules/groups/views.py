@@ -17,7 +17,6 @@ class GroupsView(View):
 
     def post(self, request, *args, **kwargs):
         received_codes = get_post_params(request).get('group_codes', [])
-        received_codes = ['IM-BMSOTP1', 'IM-BMSOTP']
         exists, data = Cache.get_key(settings.GROUP_CODE_REDIS_KEY)
         if not exists:  # if not in Cache, fetch from DB and refresh Cache.
             all_codes = set(GroupCodes.objects.all().values_list('master_name',
@@ -36,18 +35,17 @@ class GroupsView(View):
         groups, lst = [], []
         for code in received_codes:
             code = code.lower()
-            master_name = code.split('-')[-1]
             exists, group = Cache.get_key(settings.GROUP_CODE_REDIS_KEY,
-                                          master_name)
+                                          code)
             if not exists:
-                closest_code = get_close_matches(word=master_name, cutoff=0.8,
+                closest_code = get_close_matches(word=code, cutoff=0.8,
                                                  n=1, possibilities=all_codes)
                 if not closest_code:
                     continue
 
-                master_name = closest_code[0]
+                code = closest_code[0]
                 exists, group = Cache.get_key(settings.GROUP_CODE_REDIS_KEY,
-                                              master_name)
+                                              code)
             if group in lst:
                 continue
 
@@ -59,13 +57,12 @@ class GroupsView(View):
             if not exists:
                 gid, gname = gd['id'], gd['name']
                 # inserting in DB.
-                GroupCodes.objects.create(name=code, master_name=master_name,
-                                          group__id=gid)
+                GroupCodes.objects.create(master_name=code, group__id=gid)
                 # Cache GroupVsCode Mapping
-                Cache.set_key(key=master_name, value=gname,
+                Cache.set_key(key=code, value=gname,
                               key_type=settings.GROUP_CODE_REDIS_KEY)
                 # Caching Group Details - appending master name in Group.
-                Cache.set_key(key=gname, value=master_name,
+                Cache.set_key(key=gname, value=code,
                               key_type=settings.GROUP_REDIS_KEY, append=True)
 
         response = {

@@ -48,13 +48,12 @@ class Groups(models.Model):
 
 
 class GroupCodes(models.Model):
-    name = models.CharField(max_length=255, db_index=True, unique=True)
     master_name = models.CharField(max_length=255, db_index=True)
     group = models.ForeignKey(Groups, db_index=True)
     date = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return self.name
+        return self.master_name
 
     @classmethod
     def get_codes(cls, group_id):

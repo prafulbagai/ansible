@@ -13,8 +13,7 @@ class GroupsAdmin(admin.ModelAdmin):
 
 
 class GroupCodesAdmin(admin.ModelAdmin):
-    list_display = ('name', 'master_name', 'group', 'date',)
-    search_fields = ['name']
+    list_display = ('master_name', 'group', 'date',)
 
 
 admin.site.register(Category, CategoryAdmin)
