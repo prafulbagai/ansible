@@ -9,5 +9,12 @@ REDIS_SETTINGS = {
 if not settings.DEBUG:
     REDIS_SETTINGS['password'] = '17576cube'
 
+# REDIS KEYS.
 GROUP_REDIS_KEY = 'groups'
 GROUP_CODE_REDIS_KEY = 'codes'
+
+# JSON KEY.
+GROUP_CODES_JSON_KEY = 'group_codes'
+
+# ZIP ICON FOLDER NAME
+ICON_FOLDER_NAME = 'Brand Icons'

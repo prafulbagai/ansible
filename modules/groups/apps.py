@@ -10,4 +10,6 @@ class GroupsConfig(AppConfig):
     def ready(self):
         # refresh Cache.
         from models import GroupCodes
+        import modules.groups.signals
+
         GroupCodes.refresh_cache()

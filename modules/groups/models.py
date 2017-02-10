@@ -18,8 +18,8 @@ class Category(models.Model):
 
 class Groups(models.Model):
     name = models.CharField(max_length=255, db_index=True, unique=True)
-    icon = models.ImageField(upload_to='', null=True, blank=True)
-    phone_number = models.CharField(max_length=255, default='')
+    icon = models.ImageField(upload_to='media/', null=True, blank=True)
+    phone_number = models.CharField(max_length=255, default='', null=True, blank=True)
     category = models.ForeignKey(Category, db_index=True)
     date = models.DateTimeField(auto_now=True)
 
@@ -31,8 +31,8 @@ class Groups(models.Model):
         group_id = self.id
         group_codes = GroupCodes.get_codes(group_id)
         try:
-            icon = self.icon.url
-        except:
+            icon = str(self.icon.url)
+        except Exception, e:
             icon = ''
 
         return {
@@ -42,8 +42,8 @@ class Groups(models.Model):
             'icon': icon,
             'category': category.name,
             'category_id': category.id,
-            'group_codes': group_codes,
             'date': datetime_to_milli(self.date),
+            settings.GROUP_CODES_JSON_KEY: group_codes,
         }
 
 
@@ -72,3 +72,13 @@ class GroupCodes(models.Model):
         Cache.hmset(settings.GROUP_CODE_REDIS_KEY, code_vs_group)
         # Caching Group Details - appending master name in Group.
         Cache.hmset(settings.GROUP_REDIS_KEY, group)
+        return {
+            'groups': group,
+            'codes': code_vs_group
+        }
+
+
+class UnavailableCodes(models.Model):
+    master_name = models.CharField(max_length=255)
+    group_name = models.CharField(max_length=255)
+    count = models.IntegerField(default=0)

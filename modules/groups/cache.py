@@ -19,8 +19,20 @@ class Cache(object):
             return False
 
     @classmethod
-    def set_key(cls, key, value, key_type, append=False, hmset=False):
-        if not append:
+    def set_key(cls, key, value, key_type, dict_key=False):
+        """
+        Set key in a Redis.
+
+        Can set following key-value pairs:-
+            1) {key_type: {key: value}}, ie simple dict.
+            2) {key_type: {key: {name: name, phone: phone}}}, ie nested dict
+        - key_type = either codes/groups (settings variables)
+        - key = group_name
+        - value = The updated value.
+        - dict_key = If value is nested dict, and a particular key(dict_key)
+                     of nested dict needs to be updated
+        """
+        if not dict_key:  # if not nested dict, then set value directly.
             try:
                 REDIS_CLIENT.hset(key_type, key, value)
                 return True
@@ -31,9 +43,17 @@ class Cache(object):
         if not exists:
             return False
 
-        details['group_codes'].append(value)
+        if dict_key not in details:
+            return False
+
+        # if value is of 'list' type, then append.
+        if isinstance(details[dict_key], list):
+            details[dict_key].append(value)
+        else:  # else assign value directly.
+            details[dict_key] = value
+
         try:
-            REDIS_CLIENT.hmset(key_type, key, details)
+            REDIS_CLIENT.hmset(key_type, details)
             return True
         except:
             return False
@@ -63,3 +83,14 @@ class Cache(object):
                     pass
 
         return (True, response)
+
+    @classmethod
+    def del_key(cls, key_type, key=None):
+        try:
+            if not key:  # if no key is present, then delete the complete dict.
+                REDIS_CLIENT.delete(key_type)
+            else:  # else delete the specific key.
+                exists, data = cls.get_key(key_type, key)
+            return True
+        except:
+            return False

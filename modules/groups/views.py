@@ -1,19 +1,35 @@
 
+import json
+
+from django.db.models import F
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.conf import settings
 
 from difflib import get_close_matches
 
 from cache import Cache
-from models import GroupCodes, Groups
 from modules.utils import get_post_params
+from models import GroupCodes, Groups, UnavailableCodes
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GroupsView(View):
+
+    def get(self, request, *args, **kwargs):
+        exists, groups = Cache.get_key(key_type=settings.GROUP_REDIS_KEY)
+        if groups:
+            groups = {k: v for k, v in groups.iteritems()}
+        else:
+            groups = {g.name: g.to_json() for g in Groups.objects.all()}
+
+        response = {
+            'status': 200,
+            'groups': groups
+        }
+        return JsonResponse(response, safe=False)
 
     def post(self, request, *args, **kwargs):
         received_codes = get_post_params(request).get('group_codes', [])
@@ -40,12 +56,22 @@ class GroupsView(View):
             if not exists:
                 closest_code = get_close_matches(word=code, cutoff=0.8,
                                                  n=1, possibilities=all_codes)
-                if not closest_code:
-                    continue
+                if closest_code:
+                    code = closest_code[0]
+                    exists, group = Cache.get_key(settings.GROUP_CODE_REDIS_KEY,
+                                                  code)
+                else:
+                    group = ''
 
-                code = closest_code[0]
-                exists, group = Cache.get_key(settings.GROUP_CODE_REDIS_KEY,
-                                              code)
+                uc, created = UnavailableCodes.objects.get_or_create(master_name=code,
+                                                                     group=group,
+                                                                     defaults={'count': 1})
+                if not created:
+                    uc.count = F('count') + 1
+                    uc.save()
+
+                continue
+
             if group in lst:
                 continue
 
@@ -58,12 +84,13 @@ class GroupsView(View):
                 gid, gname = gd['id'], gd['name']
                 # inserting in DB.
                 GroupCodes.objects.create(master_name=code, group__id=gid)
-                # Cache GroupVsCode Mapping
+                # Cache CodeVsGroup Mapping
                 Cache.set_key(key=code, value=gname,
                               key_type=settings.GROUP_CODE_REDIS_KEY)
                 # Caching Group Details - appending master name in Group.
                 Cache.set_key(key=gname, value=code,
-                              key_type=settings.GROUP_REDIS_KEY, append=True)
+                              key_type=settings.GROUP_REDIS_KEY,
+                              dict_key=settings.GROUP_CODES_JSON_KEY)
 
         response = {
             'status': 200,

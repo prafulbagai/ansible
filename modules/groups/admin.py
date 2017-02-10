@@ -1,21 +1,25 @@
 
 from django.contrib import admin
-from models import Groups, GroupCodes, Category
+
+from models import Groups, GroupCodes, Category, UnavailableCodes
 
 
+@admin.register(UnavailableCodes)
+class UnavailableCodesAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(Groups)
 class GroupsAdmin(admin.ModelAdmin):
     list_display = ('name', 'icon', 'date')
     search_fields = ['name']
 
 
+@admin.register(GroupCodes)
 class GroupCodesAdmin(admin.ModelAdmin):
     list_display = ('master_name', 'group', 'date',)
-
-
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Groups, GroupsAdmin)
-admin.site.register(GroupCodes, GroupCodesAdmin)
