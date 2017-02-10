@@ -5,8 +5,8 @@ from django.db import models
 
 
 class ExcelFile(models.Model):
-    file = models.FileField(upload_to='media/')
+    file = models.FileField(upload_to='static/')
 
 
 class Icons(models.Model):
-    icons = models.FileField(upload_to='media/')
+    icons = models.FileField(upload_to='static/')

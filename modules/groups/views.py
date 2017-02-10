@@ -1,5 +1,5 @@
 
-import json
+import ast
 
 from django.db.models import F
 from django.conf import settings
@@ -21,7 +21,7 @@ class GroupsView(View):
     def get(self, request, *args, **kwargs):
         exists, groups = Cache.get_key(key_type=settings.GROUP_REDIS_KEY)
         if groups:
-            groups = {k: v for k, v in groups.iteritems()}
+            groups = {k: ast.literal_eval(v) for k, v in groups.iteritems()}
         else:
             groups = {g.name: g.to_json() for g in Groups.objects.all()}
 

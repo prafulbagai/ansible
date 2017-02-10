@@ -32,7 +32,7 @@ class Groups(models.Model):
         group_codes = GroupCodes.get_codes(group_id)
         try:
             icon = str(self.icon.url)
-        except Exception, e:
+        except:
             icon = ''
 
         return {
