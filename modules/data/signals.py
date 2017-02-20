@@ -32,6 +32,7 @@ def save_excel(sender, instance, **kwargs):
                                                       category=category,
                                                       defaults={'phone_number': phone_number})
             for code in codes.split(','):
+                code = code.replace(' ', '')
                 code, ccreated = GroupCodes.objects \
                                            .update_or_create(master_name=code,
                                                              defaults={'group': group})
