@@ -36,6 +36,8 @@ def save_excel(sender, instance, **kwargs):
                                            .update_or_create(master_name=code,
                                                              defaults={'group': group})
 
+    GroupCodes.refresh_cache()
+
 
 @receiver(post_save, sender=Icons)
 def save_icons(sender, instance, **kwargs):
@@ -58,3 +60,5 @@ def save_icons(sender, instance, **kwargs):
             url = upload_to_s3(filepath, upload_to_path)
             group.icon = icon
             group.save()
+
+    GroupCodes.refresh_cache()

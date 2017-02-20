@@ -33,6 +33,10 @@ def datetime_to_milli(dt):
     return int((dt - epoch).total_seconds() * 1000)
 
 
+def milli_to_datetime(ms):
+    return datetime.fromtimestamp(ms / 1000.0)
+
+
 def upload_to_s3(file_path, file_name):
     key_info = Key(bucket)
     key_info.key = file_name
@@ -52,3 +56,30 @@ def download_file_from_url(url, filename=None):
             if chunk:  # filter out keep-alive new chunks
                 fle.write(chunk)
     return filename
+
+
+def is_key_available(keys_posted, *required_args):
+    for key in required_args:
+        if key not in keys_posted:
+            return (False, key)
+    return (True, None)
+
+
+def check_args(cls, *required_args):
+    def wrapper(func):
+        def inner(self, request, *args, **kwargs):  # inner function needs parameters
+            if request.method == 'GET':
+                keys_posted = request.GET.keys()
+            else:
+                keys_posted = get_post_params(request).keys()
+
+            available, key = is_key_available(keys_posted, *required_args)
+            if not available:
+                response = {
+                    'status': 400,
+                    'message': 'key `' + str(key) + '` not present'
+                }
+                return JsonResponse(response, safe=False)
+            return func(self, request, *args, **kwargs)
+        return inner
+    return wrapper

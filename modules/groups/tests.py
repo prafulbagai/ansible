@@ -1,32 +1,156 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-from boto.s3.key import Key
-import os
-from boto.s3.connection import S3Connection
+"""
+    SleekXMPP: The Sleek XMPP Library
+    Copyright (C) 2010  Nathanael C. Fritz
+    This file is part of SleekXMPP.
 
-AWS_STORAGE_BUCKET_NAME = 'message-icons'
-AWS_ACCESS_KEY_ID = 'AKIAJSIFWXF4UOQPMFMQ'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_S3_HOST = 's3.ap-south-1.amazonaws.com'
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    See the file LICENSE for copying permission.
+"""
 
-conn = S3Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,
-                    host=AWS_S3_HOST)
-bucket = conn.get_bucket(AWS_STORAGE_BUCKET_NAME)
+import sys
+import logging
+import getpass
+from optparse import OptionParser
+
+import sleekxmpp
+from sleekxmpp.exceptions import IqError, IqTimeout
+
+# Python versions before 3.0 do not use UTF-8 encoding
+# by default. To ensure that Unicode is handled properly
+# throughout SleekXMPP, we will set the default encoding
+# ourselves to UTF-8.
+if sys.version_info < (3, 0):
+    from sleekxmpp.util.misc_ops import setdefaultencoding
+    setdefaultencoding('utf8')
+else:
+    raw_input = input
 
 
-def upload_to_s3(file_path, file_name):
-    key_info = Key(bucket)
-    key_info.key = file_name
-    key_info.set_contents_from_filename(file_path)
-    bucket.set_acl('public-read', file_name)
-    print vars(bucket)
-    url = key_info.generate_url(expires_in=0, query_auth=False)
-    return url
+class RegisterBot(sleekxmpp.ClientXMPP):
 
-directory = '/Users/praful/Desktop/cube/c26_mclients/Brand Icons/'
-icons = [p for p in os.listdir(directory)]
-for icon in icons:
-    if not icon.endswith('.png'):
-        continue
-    file_path = directory + icon
-    print upload_to_s3(file_path, '/media/' + icon)
+    """
+    A basic bot that will attempt to register an account
+    with an XMPP server.
+
+    NOTE: This follows the very basic registration workflow
+          from XEP-0077. More advanced server registration
+          workflows will need to check for data forms, etc.
+    """
+
+    def __init__(self, jid, password):
+        print 1
+        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        print 2
+        # The session_start event will be triggered when
+        # the bot establishes its connection with the server
+        # and the XML streams are ready for use. We want to
+        # listen for this event so that we we can initialize
+        # our roster.
+        self.add_event_handler("session_start", self.start, threaded=True)
+        print 3
+
+        # The register event provides an Iq result stanza with
+        # a registration form from the server. This may include
+        # the basic registration fields, a data form, an
+        # out-of-band URL, or any combination. For more advanced
+        # cases, you will need to examine the fields provided
+        # and respond accordingly. SleekXMPP provides plugins
+        # for data forms and OOB links that will make that easier.
+        self.add_event_handler("register", self.register, threaded=True)
+        print 4
+
+    def start(self, event):
+        """
+        Process the session_start event.
+
+        Typical actions for the session_start event are
+        requesting the roster and broadcasting an initial
+        presence stanza.
+
+        Arguments:
+            event -- An empty dictionary. The session_start
+                     event does not provide any additional
+                     data.
+        """
+        print 11
+        self.send_presence()
+        print 21
+        self.get_roster()
+        print 31
+
+        # We're only concerned about registering, so nothing more to do here.
+        self.disconnect()
+        print 41
+
+    def register(self, iq):
+        """
+        Fill out and submit a registration form.
+
+        The form may be composed of basic registration fields, a data form,
+        an out-of-band link, or any combination thereof. Data forms and OOB
+        links can be checked for as so:
+
+        if iq.match('iq/register/form'):
+            # do stuff with data form
+            # iq['register']['form']['fields']
+        if iq.match('iq/register/oob'):
+            # do stuff with OOB URL
+            # iq['register']['oob']['url']
+
+        To get the list of basic registration fields, you can use:
+            iq['register']['fields']
+        """
+        print 2222
+        resp = self.Iq()
+        resp['type'] = 'set'
+        resp['register']['username'] = self.boundjid.user
+        resp['register']['password'] = self.password
+        print 111
+        try:
+            resp.send(now=True)
+            logging.info("Account created for %s!" % self.boundjid)
+        except IqError as e:
+            logging.error("Could not register account: %s" %
+                    e.iq['error']['text'])
+            self.disconnect()
+        except IqTimeout:
+            logging.error("No response from server.")
+            self.disconnect()
+
+
+if __name__ == '__main__':
+
+    jid, password = 'test3098@goreos.com', '123456543'
+    xmpp = RegisterBot(jid, password)
+    xmpp.register_plugin('xep_0030')  # Service Discovery
+    xmpp.register_plugin('xep_0004')  # Data forms
+    xmpp.register_plugin('xep_0066')  # Out-of-band Data
+    xmpp.register_plugin('xep_0077')  # In-band Registration
+
+    # Some servers don't advertise support for inband registration, even
+    # though they allow it. If this applies to your server, use:
+    xmpp['xep_0077'].force_registration = True
+
+    # If you are working with an OpenFire server, you may need
+    # to adjust the SSL version used:
+    # xmpp.ssl_version = ssl.PROTOCOL_SSLv3
+
+    # If you want to verify the SSL certificates offered by a server:
+    xmpp.ca_certs = "/Users/praful/Desktop/cube/ejabberd-registration/goreos.com.pem"
+
+    # Connect to the XMPP server and start processing XMPP stanzas.
+    if xmpp.connect():
+        # If you do not have the dnspython library installed, you will need
+        # to manually specify the name of the server if it does not match
+        # the one in the JID. For example, to use Google Talk you would
+        # need to use:
+        #
+        # if xmpp.connect(('talk.google.com', 5222)):
+        #     ...
+        print 1111
+        xmpp.process(block=True)
+        print("Done")
+    else:
+        print("Unable to connect.")
