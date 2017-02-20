@@ -21,7 +21,7 @@ class Groups(models.Model):
     icon = models.ImageField(upload_to='media/', null=True, blank=True)
     phone_number = models.CharField(max_length=255, default='', null=True, blank=True)
     category = models.ForeignKey(Category, db_index=True)
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now=True, db_index=True)
 
     def __unicode__(self):
         return self.name
@@ -48,7 +48,7 @@ class Groups(models.Model):
 
 
 class GroupCodes(models.Model):
-    master_name = models.CharField(max_length=255, db_index=True)
+    master_name = models.CharField(max_length=255, db_index=True, unique=True)
     group = models.ForeignKey(Groups, db_index=True)
     date = models.DateTimeField(auto_now=True)
 
