@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 from difflib import get_close_matches
 
@@ -17,7 +18,7 @@ from models import GroupCodes, Groups, UnavailableCodes
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GroupsView(View):
-
+    @method_decorator(login_required, name='dispatch')
     def get(self, request, *args, **kwargs):
         exists, groups = Cache.get_key(key_type=settings.GROUP_REDIS_KEY)
         if groups:
