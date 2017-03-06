@@ -147,10 +147,11 @@ AWS_STORAGE_BUCKET_NAME = 'cs.message.reosapps.com'
 AWS_ACCESS_KEY_ID = 'AKIAJSIFWXF4UOQPMFMQ'
 AWS_SECRET_ACCESS_KEY = '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'
 AWS_S3_HOST = 's3.ap-south-1.amazonaws.com'
+AWS_S3_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'
 # AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_CUSTOM_DOMAIN = '%s' % AWS_STORAGE_BUCKET_NAME
 
-MEDIAFILES_LOCATION = 'media'
+MEDIAFILES_LOCATION = ''
 MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
 DEFAULT_FILE_STORAGE = 'c26_mclients.custom_storages.MediaStorage'
 
