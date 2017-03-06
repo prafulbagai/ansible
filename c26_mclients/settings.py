@@ -136,8 +136,28 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static/')
+
+# URL prefix for static files.
+# Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
+# Additional locations of static files
+STATICFILES_DIRS = (
+    os.path.join(os.path.dirname(__file__), '../static/'),
+
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+)
+
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
 # ################AWS SETTINGS################
 # AWS_HEADERS = {
 #     'Cache-Control': 'max-age=94608000',
