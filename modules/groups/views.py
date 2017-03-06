@@ -27,7 +27,6 @@ class GroupsView(View):
                     groups[k] = ast.literal_eval(v)
                 except:
                     continue
-            groups = {k: ast.literal_eval(v) for k, v in groups.iteritems()}
         else:
             groups = {g.name: g.to_json() for g in Groups.objects.all()}
 
