@@ -5,8 +5,7 @@ import requests
 
 from boto.s3.key import Key
 from datetime import datetime
-from boto.s3.connection import S3Connection
-
+from boto.s3.connection import S3Connection, OrdinaryCallingFormat
 from django.conf import settings
 
 epoch = datetime.utcfromtimestamp(0)
@@ -14,7 +13,8 @@ epoch = datetime.utcfromtimestamp(0)
 os.environ['S3_USE_SIGV4'] = 'True'
 
 conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY,
-                    host=settings.AWS_S3_HOST)
+                    host=settings.AWS_S3_HOST,
+                    calling_format=OrdinaryCallingFormat())
 bucket = conn.get_bucket(settings.AWS_STORAGE_BUCKET_NAME)
 
 

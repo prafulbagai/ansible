@@ -22,6 +22,11 @@ class GroupsView(View):
     def get(self, request, *args, **kwargs):
         exists, groups = Cache.get_key(key_type=settings.GROUP_REDIS_KEY)
         if groups:
+            for k, v in groups.iteritems():
+                try:
+                    groups[k] = ast.literal_eval(v)
+                except:
+                    continue
             groups = {k: ast.literal_eval(v) for k, v in groups.iteritems()}
         else:
             groups = {g.name: g.to_json() for g in Groups.objects.all()}
