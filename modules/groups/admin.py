@@ -16,7 +16,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Groups)
 class GroupsAdmin(admin.ModelAdmin):
-    list_display = ('name', 'icon', 'date')
+    list_display = ('name', 'icon', 'date', 'phone_number')
     search_fields = ['name']
 
 
