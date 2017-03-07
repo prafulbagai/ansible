@@ -163,7 +163,7 @@ STATICFILES_FINDERS = (
 #     'Cache-Control': 'max-age=94608000',
 #     'Content-Encoding': 'gzip'
 # }
-AWS_STORAGE_BUCKET_NAME = 'content-delivered.reosapps.com'
+AWS_STORAGE_BUCKET_NAME = 'delivered.reosapps.com'
 AWS_ACCESS_KEY_ID = 'AKIAJSIFWXF4UOQPMFMQ'
 AWS_SECRET_ACCESS_KEY = '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'
 AWS_S3_HOST = 's3.ap-south-1.amazonaws.com'
