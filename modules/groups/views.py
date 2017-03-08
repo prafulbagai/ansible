@@ -1,7 +1,6 @@
 
 import ast
 
-from django.db.models import F
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.generic import View
@@ -9,11 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
-from difflib import get_close_matches
-
 from cache import Cache
 from modules.utils import get_post_params, milli_to_datetime, check_args
-from models import GroupCodes, Groups, UnavailableCodes
+from models import GroupCodes, Groups
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -64,22 +61,6 @@ class GroupsView(View):
             exists, group = Cache.get_key(settings.GROUP_CODE_REDIS_KEY,
                                           code)
             if not exists:  # store in Unavailable codes.
-                closest_code = get_close_matches(word=code, cutoff=0.8,
-                                                 n=1, possibilities=all_codes)
-                if closest_code:
-                    code = closest_code[0]
-                    exists, group = Cache.get_key(settings.GROUP_CODE_REDIS_KEY,
-                                                  code)
-                else:
-                    group = ''
-
-                uc, created = UnavailableCodes.objects.get_or_create(master_name=code,
-                                                                     group_name=group,
-                                                                     defaults={'count': 1})
-                if not created:
-                    uc.count = F('count') + 1
-                    uc.save()
-
                 continue
 
             if group in lst:
@@ -91,19 +72,6 @@ class GroupsView(View):
 
             groups.append(gd)
             lst.append(group)
-
-            # add in DB & Cache.
-            # if not exists:
-            #     gid, gname = gd['id'], gd['name']
-            #     # inserting in DB.
-            #     GroupCodes.objects.create(master_name=code, group__id=gid)
-            #     # Cache CodeVsGroup Mapping
-            #     Cache.set_key(key=code, value=gname,
-            #                   key_type=settings.GROUP_CODE_REDIS_KEY)
-            #     # Caching Group Details - appending master name in Group.
-            #     Cache.set_key(key=gname, value=code,
-            #                   key_type=settings.GROUP_REDIS_KEY,
-            #                   dict_key=settings.GROUP_CODES_JSON_KEY)
 
         response = {
             'status': 200,

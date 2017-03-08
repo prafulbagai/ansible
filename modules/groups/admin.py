@@ -16,10 +16,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Groups)
 class GroupsAdmin(admin.ModelAdmin):
-    list_display = ('name', 'icon', 'date', 'phone_number')
+    list_display = ('id', 'name', 'icon', 'date', 'phone_number', 'category')
     search_fields = ['name']
 
 
 @admin.register(GroupCodes)
 class GroupCodesAdmin(admin.ModelAdmin):
-    list_display = ('master_name', 'group', 'date',)
+    list_display = ('master_name', 'group', 'date')
+    search_fields = ['master_name', 'group']
