@@ -7,7 +7,7 @@ REDIS_SETTINGS = {
     'password': '',
 }
 if not settings.DEBUG:
-    REDIS_SETTINGS['password'] = '17576cube'
+    REDIS_SETTINGS['password'] = ''
 
 # REDIS KEYS.
 GROUP_REDIS_KEY = 'groups'
