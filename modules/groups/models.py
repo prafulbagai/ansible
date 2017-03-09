@@ -68,6 +68,7 @@ class GroupCodes(models.Model):
         code_vs_group = {g.master_name.lower(): g.group.name for g in cls.objects.all() \
                                                                          .select_related('group')}
 
+        Cache.flush()
         # Cache GroupVsCode Mapping
         Cache.hmset(settings.GROUP_CODE_REDIS_KEY, code_vs_group)
         # Caching Group Details - appending master name in Group.

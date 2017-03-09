@@ -11,6 +11,14 @@ class Cache(object):
     """Cache class for caching."""
 
     @classmethod
+    def flush(cls):
+        try:
+            REDIS_CLIENT.flushall()
+            return True
+        except:
+            return False
+
+    @classmethod
     def hmset(cls, key_type, mapping):
         try:
             REDIS_CLIENT.hmset(key_type, mapping)
