@@ -57,9 +57,9 @@ class GroupCodes(models.Model):
 
     @classmethod
     def get_codes(cls, group_id):
-        return cls.objects.filter(group_id=group_id).values_list('master_name',
-                                                                 flat=True) \
-                                                    .distinct()
+        return list(cls.objects.filter(group_id=group_id) \
+                               .values_list('master_name', flat=True) \
+                               .distinct())
 
     @classmethod
     def refresh_cache(cls):
