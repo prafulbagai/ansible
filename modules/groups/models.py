@@ -80,6 +80,14 @@ class GroupCodes(models.Model):
 
 
 class UnavailableCodes(models.Model):
-    master_name = models.CharField(max_length=255)
-    group_name = models.CharField(max_length=255)
-    count = models.IntegerField(default=0)
+    master_name = models.CharField(max_length=255, db_index=True)
+    count = models.IntegerField(default=0, db_index=True)
+
+    def __unicode__(self):
+        return self.master_name
+
+
+class UnavailableCodesHistory(models.Model):
+    device_id = models.IntegerField(db_index=True)
+    master_name = models.CharField(max_length=255, db_index=True)
+    date = models.DateTimeField(auto_now=True, db_index=True)

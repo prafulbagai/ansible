@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 from cache import Cache
+from tasks import add_to_unavailable
 from modules.utils import get_post_params, milli_to_datetime, check_args
 from models import GroupCodes, Groups
 
@@ -33,9 +34,11 @@ class GroupsView(View):
         }
         return JsonResponse(response, safe=False)
 
-    @check_args('group_codes')
+    @check_args('group_codes', 'GAID', 'IMEI1', 'IMEI2', 'android_id')
     def post(self, request, *args, **kwargs):
-        received_codes = get_post_params(request).get('group_codes', [])
+        data = get_post_params(request).get
+        received_codes = data('group_codes', [])
+
         exists, data = Cache.get_key(settings.GROUP_CODE_REDIS_KEY)
         if not exists:  # if not in Cache, fetch from DB and refresh Cache.
             GroupCodes.refresh_cache()
@@ -55,12 +58,13 @@ class GroupsView(View):
             }
             return JsonResponse(response, safe=False)
 
-        groups, lst = [], []
+        groups, lst, unavailable = [], [], []
         for code in received_codes:
             code = code.lower()
             exists, group = Cache.get_key(settings.GROUP_CODE_REDIS_KEY,
                                           code)
             if not exists:  # store in Unavailable codes.
+                unavailable.append(code)
                 continue
 
             if group in lst:
@@ -72,6 +76,16 @@ class GroupsView(View):
 
             groups.append(gd)
             lst.append(group)
+
+        if unavailable:
+            data = {
+                'codes': unavailable,
+                'IMEI1': data('IMEI1'),
+                'IMEI2': data('IMEI2'),
+                'GAID': data('GAID'),
+                'android_id': data('android_id')
+            }
+            add_to_unavailable.delay(data)
 
         response = {
             'status': 200,

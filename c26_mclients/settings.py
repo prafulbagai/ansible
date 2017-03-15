@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djcelery',
     'modules.groups',
     'modules.data'
 ]
@@ -216,7 +217,16 @@ if not DEBUG:
             'PASSWORD': '17576cube',
             'HOST': '',
             'PORT': '',
-        }
+        },
+        'devices': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'cube26',
+            # The following settings are not used with sqlite3:
+            'USER': 'postgres_reader',
+            'PASSWORD': 'R34DB26@#CU83_26',
+            'HOST': '69.164.217.110',
+            'PORT': '',
+        },
     }
 
 # ############## EMAIL SETTINGS ###################
@@ -226,6 +236,13 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_PASSWORD = 'zsqmjphgdksqakvx'
 EMAIL_HOST_USER = 'praful.bagai@cube26.com'
 SERVER_EMAIL = 'praful.bagai@cube26.com'
+
+
+# ################ CELERY SETTINGS ################
+BROKER_URL = 'amqp://guest:guest@localhost//'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 
 from local_settings import *
