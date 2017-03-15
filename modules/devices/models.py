@@ -117,8 +117,9 @@ class DevicesRegistered(models.Model):
         else:
             device = device.filter(android_id=android_id)
 
+        device = device.first()
         # if device not registered, then device_id = 0(default)
-        return device.id if device.first() else 0
+        return device.id if device else 0
 
 
 class DeviceUrls(models.Model):
