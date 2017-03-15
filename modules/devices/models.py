@@ -102,17 +102,23 @@ class DevicesRegistered(models.Model):
 
     @classmethod
     def get_device_id(cls, imei_1, android_id):
-        if not (imei_1 and android_id):
-            return 0
 
-        if not isinstance(imei_1, int):
+        device = cls.objects.using('devices')
+        if not (imei_1 or android_id):
             return 0
-
-        device = cls.objects.using('devices') \
-                            .filter(imei_1=imei_1, android_id=android_id).first()
+        elif imei_1:
+            try:
+                imei_1 = int(imei_1)
+            except:
+                return 0
+            device = device.filter(imei_1=imei_1)
+            if android_id:
+                device = device.filter(android_id=android_id)
+        else:
+            device = device.filter(android_id=android_id)
 
         # if device not registered, then device_id = 0(default)
-        return device.id if device else 0
+        return device.id if device.first() else 0
 
 
 class DeviceUrls(models.Model):
