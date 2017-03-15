@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'djcelery',
     'modules.groups',
-    'modules.data'
+    'modules.data',
+    'modules.devices'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -89,6 +90,15 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '',
+        'PORT': '',
+    },
+    'devices': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'cube26',
+        # The following settings are not used with sqlite3:
+        'USER': 'postgres_reader',
+        'PASSWORD': 'R34DB26@#CU83_26',
+        'HOST': '69.164.217.110',
         'PORT': '',
     }
 }
@@ -226,7 +236,7 @@ if not DEBUG:
             'PASSWORD': 'R34DB26@#CU83_26',
             'HOST': '69.164.217.110',
             'PORT': '',
-        },
+        }
     }
 
 # ############## EMAIL SETTINGS ###################

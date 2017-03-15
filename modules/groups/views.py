@@ -36,8 +36,8 @@ class GroupsView(View):
 
     @check_args('group_codes', 'GAID', 'IMEI1', 'IMEI2', 'android_id')
     def post(self, request, *args, **kwargs):
-        data = get_post_params(request).get
-        received_codes = data('group_codes', [])
+        rdata = get_post_params(request).get
+        received_codes = rdata('group_codes', [])
 
         exists, data = Cache.get_key(settings.GROUP_CODE_REDIS_KEY)
         if not exists:  # if not in Cache, fetch from DB and refresh Cache.
@@ -80,10 +80,10 @@ class GroupsView(View):
         if unavailable:
             data = {
                 'codes': unavailable,
-                'IMEI1': data('IMEI1'),
-                'IMEI2': data('IMEI2'),
-                'GAID': data('GAID'),
-                'android_id': data('android_id')
+                'IMEI1': rdata('IMEI1'),
+                'IMEI2': rdata('IMEI2'),
+                'GAID': rdata('GAID'),
+                'android_id': rdata('android_id')
             }
             add_to_unavailable.delay(data)
 

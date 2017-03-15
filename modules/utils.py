@@ -7,6 +7,7 @@ from boto.s3.key import Key
 from datetime import datetime
 from boto.s3.connection import S3Connection, OrdinaryCallingFormat
 from django.conf import settings
+from django.http import JsonResponse
 
 epoch = datetime.utcfromtimestamp(0)
 

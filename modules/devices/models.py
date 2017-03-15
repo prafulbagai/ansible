@@ -1,7 +1,27 @@
 
 from django.db import models
-# from modules.consumer.config import PHONE_TYPE_CHOICE
-# from modules.consumer.core.models import Timezone, Urls
+
+
+class Urls(models.Model):
+    """.."""
+
+    url = models.CharField(max_length=255, db_column='url', unique=True)
+
+    class Meta:
+        """.."""
+        managed = False
+        db_table = 'urls'
+
+
+class Timezone(models.Model):
+    """.."""
+
+    name = models.CharField(max_length=255, db_column="name", unique=True)
+
+    class Meta:
+        """.."""
+        managed = False
+        db_table = 'timezone'
 
 
 class OperatingSystem(models.Model):
@@ -16,7 +36,7 @@ class OperatingSystem(models.Model):
 
     class Meta:
         """.."""
-
+        managed = False
         unique_together = (("android_version", "vendor_name"),)
         db_table = 'operating_system'
 
@@ -43,7 +63,7 @@ class DevicesModels(models.Model):
 
     class Meta:
         """.."""
-
+        managed = False
         db_table = 'devices_models'
         unique_together = (("model", "manufacturer"),)
 
@@ -68,14 +88,36 @@ class DevicesRegistered(models.Model):
     gms_version = models.CharField(max_length=255, db_column='gms_version', null=True)
     accounts = models.CharField(max_length=255, db_column='accounts', null=True)
     timezone_id = models.ForeignKey(
-        'Timezone', db_column='timezone_id', null=True)
+        Timezone, db_column='timezone_id', null=True)
 
     os_id = models.ManyToManyField(
         OperatingSystem, db_column="os_id", blank=True)
-    urls = models.ManyToManyField('Urls', db_column='urls', blank=True, through='DeviceUrls', related_name='devices_urls')
+    urls = models.ManyToManyField(Urls, db_column='urls', blank=True, through='DeviceUrls', related_name='devices_urls')
 
     class Meta:
         """.."""
-
+        managed = False
         unique_together = (('imei_1', 'android_id'),)
         db_table = 'devices_registered'
+
+    @classmethod
+    def get_device_id(cls, imei_1, imei_2, gaid, android_id):
+        device = cls.objects.using('devices') \
+                            .filter(imei_1=imei_1, imei_2=imei_2,
+                                    android_id=android_id, gaid=gaid).first()
+
+        # if device not registered, then device_id = 0(default)
+        return device.id if device else 0
+
+
+class DeviceUrls(models.Model):
+    device_registered_id = models.ForeignKey(DevicesRegistered, null=False, db_column='devicesregistered_id')
+    url_id = models.ForeignKey(Urls, null=False, db_column='urls_id')
+    created_on = models.DateTimeField(db_column='created_on', auto_now_add=True, null=True)
+    updated_on = models.DateTimeField(db_column='updated_on', auto_now=True, null=True)
+    is_visible = models.BooleanField(db_column='is_visible', default=False)
+
+    class Meta:
+        managed = False
+        db_table = 'device_urls'
+        unique_together = (('device_registered_id', 'url_id'))
