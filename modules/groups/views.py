@@ -34,7 +34,7 @@ class GroupsView(View):
         }
         return JsonResponse(response, safe=False)
 
-    @check_args('group_codes', 'GAID', 'IMEI1', 'IMEI2', 'android_id')
+    @check_args('group_codes', 'IMEI1', 'android_id')
     def post(self, request, *args, **kwargs):
         rdata = get_post_params(request).get
         received_codes = rdata('group_codes', [])
@@ -81,8 +81,6 @@ class GroupsView(View):
             data = {
                 'codes': unavailable,
                 'IMEI1': rdata('IMEI1'),
-                'IMEI2': rdata('IMEI2'),
-                'GAID': rdata('GAID'),
                 'android_id': rdata('android_id')
             }
             add_to_unavailable.delay(data)

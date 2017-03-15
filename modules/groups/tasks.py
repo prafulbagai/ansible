@@ -8,10 +8,9 @@ from models import GroupCodes, UnavailableCodesHistory, UnavailableCodes
 
 @app.task()
 def add_to_unavailable(data):
-    imei_1, imei_2 = data['IMEI1'], data['IMEI2']
-    android_id, gaid = data['android_id'], data['GAID']
-    device_id = DevicesRegistered.get_device_id(imei_1=imei_1, imei_2=imei_2,
-                                                gaid=gaid, android_id=android_id)
+    imei_1, android_id = data['IMEI1'], data['android_id']
+    device_id = DevicesRegistered.get_device_id(imei_1=imei_1,
+                                                android_id=android_id)
 
     codes = data['codes']
     available_codes = GroupCodes.objects.filter(master_name__in=codes) \

@@ -11,4 +11,4 @@ else:
     BROKER_URL = 'amqp://admin:17576cube@localhost:5672/myvhost/'
 
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
-CELERY_IMPORTS = ('modules.register.tasks',)
+CELERY_IMPORTS = ('modules.groups.tasks',)

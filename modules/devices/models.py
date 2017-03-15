@@ -101,10 +101,15 @@ class DevicesRegistered(models.Model):
         db_table = 'devices_registered'
 
     @classmethod
-    def get_device_id(cls, imei_1, imei_2, gaid, android_id):
+    def get_device_id(cls, imei_1, android_id):
+        if not (imei_1 and android_id):
+            return 0
+
+        if not isinstance(imei_1, int):
+            return 0
+
         device = cls.objects.using('devices') \
-                            .filter(imei_1=imei_1, imei_2=imei_2,
-                                    android_id=android_id, gaid=gaid).first()
+                            .filter(imei_1=imei_1, android_id=android_id).first()
 
         # if device not registered, then device_id = 0(default)
         return device.id if device else 0
