@@ -1,7 +1,14 @@
 
 from django.contrib import admin
 
-from models import Groups, GroupCodes, Category, UnavailableCodes
+from forms import GroupCodesForm
+from models import Groups, GroupCodes, Category, UnavailableCodes, CountryCodes
+
+
+@admin.register(CountryCodes)
+class CountryCodesAdmin(admin.ModelAdmin):
+    list_display = ('name', 'code')
+    search_fields = ['name', 'code']
 
 
 @admin.register(UnavailableCodes)
@@ -23,5 +30,6 @@ class GroupsAdmin(admin.ModelAdmin):
 
 @admin.register(GroupCodes)
 class GroupCodesAdmin(admin.ModelAdmin):
+    form = GroupCodesForm
     list_display = ('master_name', 'group', 'date')
     search_fields = ['master_name', 'group__name']
