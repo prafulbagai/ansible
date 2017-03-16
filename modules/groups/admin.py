@@ -7,6 +7,7 @@ from models import Groups, GroupCodes, Category, UnavailableCodes
 @admin.register(UnavailableCodes)
 class UnavailableCodesAdmin(admin.ModelAdmin):
     list_display = ('master_name', 'count')
+    search_fields = ['master_name']
 
 
 @admin.register(Category)

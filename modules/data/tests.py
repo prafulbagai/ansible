@@ -1,6 +1,12 @@
 
-import os
+import re
+import phonenumbers
 
-file_name = '1'
-command = 'mysqldump -uroot -p17 message_groups > ' + file_name
-os.system(command)
+x = '+442083661177--'
+if re.search('[a-zA-Z]', x):
+    print 'Invalid'
+else:
+    x = phonenumbers.parse(x, None)
+    print x
+    print phonenumbers.is_possible_number(x)
+    print phonenumbers.is_valid_number(x)

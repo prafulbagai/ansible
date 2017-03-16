@@ -3,13 +3,14 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from models import GroupCodes, Groups
+from models import GroupCodes, Groups, UnavailableCodes
 # from cache import Cache
 
 
 @receiver(post_save, sender=Groups)
 def update_group_cache(sender, instance, **kwargs):
     GroupCodes.refresh_cache()
+
     # created = kwargs.get('created')
     # # Cache Groups Mapping
     # if created:  # If new group created, add to cache.
@@ -23,7 +24,14 @@ def update_group_cache(sender, instance, **kwargs):
 
 @receiver(post_save, sender=GroupCodes)
 def update_code_cache(sender, instance, **kwargs):
+    master_name = instance.master_name.upper()
+
+    # Removing code from unavailable code.
+    UnavailableCodes.objects.filter(master_name=master_name).delete()
+
+    # Finally Refreshing cache.
     GroupCodes.refresh_cache()
+
     # group, master_name = instance.group, instance.master_name.lower()
 
     # created = kwargs.get('created')

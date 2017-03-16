@@ -8,6 +8,14 @@ from cache import Cache
 from modules.utils import datetime_to_milli
 
 
+class CountryCodes(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=255, unique=True)
+
+    def __unicode__(self):
+        return self.code + ', ' + self.name
+
+
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
     date = models.DateTimeField(auto_now=True)
@@ -50,7 +58,13 @@ class Groups(models.Model):
 class GroupCodes(models.Model):
     master_name = models.CharField(max_length=255, db_index=True, unique=True)
     group = models.ForeignKey(Groups, db_index=True)
+    country_code = models.ForeignKey(CountryCodes, db_index=True, null=True, blank=True)
     date = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        # saving master_name in uppercase.
+        self.master_name = self.master_name.upper()
+        super(GroupCodes, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.master_name
@@ -65,7 +79,7 @@ class GroupCodes(models.Model):
     def refresh_cache(cls):
         """Add data to cache."""
         group = {g.name: g.to_json() for g in Groups.objects.all()}
-        code_vs_group = {g.master_name.lower(): g.group.name for g in cls.objects.all() \
+        code_vs_group = {g.master_name.upper(): g.group.name for g in cls.objects.all() \
                                                                          .select_related('group')}
 
         Cache.flush()

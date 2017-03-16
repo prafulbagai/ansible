@@ -60,7 +60,7 @@ class GroupsView(View):
 
         groups, lst, unavailable = [], [], []
         for code in received_codes:
-            code = code.lower()
+            code = code.upper()
             exists, group = Cache.get_key(settings.GROUP_CODE_REDIS_KEY,
                                           code)
             if not exists:  # store in Unavailable codes.
