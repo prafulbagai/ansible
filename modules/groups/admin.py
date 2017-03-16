@@ -23,4 +23,4 @@ class GroupsAdmin(admin.ModelAdmin):
 @admin.register(GroupCodes)
 class GroupCodesAdmin(admin.ModelAdmin):
     list_display = ('master_name', 'group', 'date')
-    search_fields = ['master_name', 'group']
+    search_fields = ['master_name', 'group__name']
