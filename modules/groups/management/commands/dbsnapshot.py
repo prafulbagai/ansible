@@ -26,7 +26,8 @@ class Command(BaseCommand):
             os.system(delcommand)
             return
 
-        print upload_to_s3(file_path, file_name)
+        upload_path = '/db/' + file_name
+        print upload_to_s3(file_path, upload_path)
 
         os.system(delcommand)
 
