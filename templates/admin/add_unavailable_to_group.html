@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<p>Select a Group to apply:</p>
+
+<form action="" method="post">
+	{% csrf_token %}
+	<br>
+    {{ group_form }}
+
+    <br><br>
+    <h2>The group will be applied to:</h2>
+
+    <ul>{{ codes|unordered_list }}</ul>
+    <br><br>
+    <input type="hidden" name="action" value="add_unavailable_codes_to_group_codes" />
+    <input type="submit" name="apply" value="Apply Group" />
+    <input type="submit" name="cancel" value="Cancel" style="background: #DDDDDD; color: #333333" />
+</form>
+
+{% endblock %}
